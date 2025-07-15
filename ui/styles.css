@@ -1,0 +1,473 @@
+/*
+ * AutoToC Chrome Extension - Content Styles
+ * Author: CodexHere
+ * GitHub: https://github.com/hangouthere/chrome-extension-autotoc
+ */
+
+:root {
+    --autotoc-button-outline-width-px: calc(
+        1px * var(--autotoc-button-outline-width)
+    );
+    --autotoc-button-width-px: calc(1px * var(--autotoc-button-width));
+    --autotoc-panel-outline-width-px: calc(
+        1px * var(--autotoc-panel-outline-width)
+    );
+    --autotoc-panel-border-radius-px: calc(
+        1px * var(--autotoc-panel-border-radius)
+    );
+    --autotoc-panel-font-size-px: calc(1px * var(--autotoc-panel-font-size));
+}
+
+body.autotoc-has-transparency {
+    --color: var(--autotoc-button-bg);
+
+    #autotoc-button {
+        background-color: color-mix(
+            in srgb,
+            var(--color) 100%,
+            transparent 100%
+        );
+
+        &:hover {
+            --color: var(--autotoc-button-hover);
+        }
+    }
+
+    #autotoc-panel {
+        background-color: color-mix(
+            in srgb,
+            var(--autotoc-panel-bg) 100%,
+            transparent 30%
+        );
+    }
+}
+
+#autotoc-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10001;
+    width: var(--autotoc-button-width-px);
+    height: var(--autotoc-button-width-px);
+    padding: 15px;
+    background-color: var(--autotoc-button-bg);
+    backdrop-filter: blur(5px);
+    color: var(--autotoc-button-text);
+    border: var(--autotoc-button-outline-width-px) solid
+        var(--autotoc-button-outline);
+    border-radius: 50%;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    transition: background-color 250ms ease;
+
+    &:hover {
+        background-color: var(--autotoc-button-hover);
+    }
+}
+
+#autotoc-panel {
+    z-index: 10000;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: content-box;
+    top: 20px;
+    right: 0;
+    width: 285px;
+    height: 400px;
+    min-width: 285px;
+    min-height: 300px;
+
+    font-family: var(--autotoc-panel-font-name), sans-serif;
+    font-size: var(--autotoc-panel-font-size-px);
+    color: var(--autotoc-panel-text);
+    background-color: var(--autotoc-panel-bg);
+    backdrop-filter: blur(5px);
+
+    border: var(--autotoc-panel-outline-width-px) solid
+        var(--autotoc-panel-outline);
+    border-radius: var(--autotoc-panel-border-radius-px);
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s ease, background-color 1s ease;
+
+    &.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    &.hidden {
+        opacity: 0;
+        pointer-events: none;
+        .resizer {
+            pointer-events: none;
+        }
+    }
+
+    header {
+        font-size: 20px;
+        color: var(--autotoc-panel-text);
+        user-select: none;
+        flex-shrink: 0;
+        line-height: 1.5;
+        margin: 0;
+        padding: 8px 8px 0.25em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: transparent;
+
+        .autotoc-title {
+            flex: 1;
+        }
+
+        .autotoc-controls {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+
+            .autotoc-separator,
+            .autotoc-collapse,
+            .autotoc-expand,
+            .autotoc-refresh,
+            .autotoc-options-cog,
+            .autotoc-close {
+                cursor: pointer;
+                font-size: 14px;
+                padding: 0 2px;
+            }
+
+            .autotoc-separator {
+                cursor: auto;
+            }
+
+            .autotoc-collapse,
+            .autotoc-expand {
+                font-size: 20px;
+            }
+
+            .autotoc-separator {
+                margin: 0 5px;
+                color: var(--autotoc-panel-outline);
+            }
+        }
+    }
+
+    .headings-list {
+        flex-grow: 1;
+        overflow-y: auto;
+        margin: 5px 0;
+        padding: 10px 0 10px 8px;
+        border-top: 1px solid var(--autotoc-panel-outline);
+        border-bottom: 1px solid var(--autotoc-panel-outline);
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: none;
+
+            margin: 5px 0;
+
+            &.visible {
+                display: list-item;
+            }
+
+            &:not(.expanded) {
+                .autotoc-toggle::before {
+                    content: '▶';
+                    font-size: 0.85em;
+                }
+
+                & > ul {
+                    display: none;
+                }
+            }
+
+            .autotoc-toggle {
+                display: inline-block;
+                width: 1em;
+                margin: 0;
+                text-align: center;
+                cursor: pointer;
+                color: var(--autotoc-panel-text);
+
+                &::before {
+                    content: '▼';
+                }
+            }
+
+            &.no-toc {
+                font-size: 1.25em;
+                display: flex;
+                justify-content: center;
+                text-align: center;
+                width: 60%;
+                margin: 1.5em auto;
+            }
+
+            /* Hacks lie beyond here!!!! */
+
+            --indent-with-arrow-base: 1.1em;
+            --indent-with-arrow: 0.6em;
+            --indent-without-arrow: 1.6em;
+
+            &[data-autotoc-heading-idx].can-toggle {
+                padding-left: var(--indent-with-arrow);
+            }
+
+            &[data-autotoc-heading-idx].can-toggle
+                > ul
+                > &[data-autotoc-heading-idx].no-toggle.no-subs {
+                padding-left: var(--indent-without-arrow);
+            }
+
+            &[data-autotoc-heading-idx].no-toggle.no-subs
+                + &[data-autotoc-heading-idx].no-toggle.has-subs {
+                padding-left: var(--indent-without-arrow);
+            }
+
+            &[data-autotoc-heading-idx].no-toggle.has-subs
+                + &[data-autotoc-heading-idx].no-toggle.no-subs
+                + &[data-autotoc-heading-idx].no-toggle.has-subs {
+                padding-left: var(--indent-without-arrow);
+            }
+
+            &[data-autotoc-heading-idx].no-toggle.has-subs {
+                padding-left: 1em;
+
+                & > ul > & {
+                    padding-left: 0;
+                }
+            }
+
+            &.heading-level-1.heading-level-1 {
+                padding-left: 0;
+
+                &.no-toggle {
+                    padding-left: var(--indent-with-arrow-base);
+                }
+            }
+
+            /* Hacks end here!!!! */
+        }
+
+        a.autotoc-heading-jumper {
+            text-decoration: none;
+            color: var(--autotoc-panel-heading);
+            &:hover {
+                color: var(--autotoc-panel-heading-hover);
+            }
+
+            &.focused {
+                font-weight: bold;
+            }
+        }
+
+        .highlight {
+            padding: 0 2px;
+            background-color: var(--autotoc-panel-highlight);
+            outline: 1px solid var(--autotoc-panel-outline);
+        }
+    }
+
+    footer.autotoc-list {
+        padding: 5px 8px;
+
+        .autotoc-stats {
+            font-size: 0.8em;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0.5em;
+            gap: 1em;
+
+            .autotoc-stats--search {
+                display: none;
+            }
+        }
+
+        .autotoc-search-input {
+            width: 96%;
+            padding: 5px;
+            border: 1px solid var(--autotoc-panel-outline);
+            border-radius: 4px;
+            background-color: var(--autotoc-panel-bg);
+            color: var(--autotoc-panel-text);
+
+            &:focus {
+                border-color: var(--autotoc-panel-heading);
+            }
+        }
+    }
+}
+
+/* reused in mulitple locations, don't encapsulate */
+
+footer.autotoc-footer {
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 12px;
+    color: var(--autotoc-panel-text);
+    text-align: center;
+    flex-shrink: 0;
+
+    a {
+        color: var(--autotoc-panel-heading);
+        text-decoration: none;
+
+        &:hover {
+            color: var(--autotoc-panel-heading-hover);
+        }
+    }
+}
+
+.autotoc-title {
+    font-family: 'Gugi', sans-serif;
+}
+
+.drag-handle {
+    cursor: move;
+}
+
+.autotoc-resizer-container {
+    --resize-mult-px: 2;
+
+    --drag-handle-width: 4;
+    --drag-handle-width-px: calc(var(--drag-handle-width) * 1px);
+    --drag-handle-width-hover-px: calc(
+        var(--drag-handle-width-px) * var(--resize-mult-px)
+    );
+
+    --drag-corner-mult: 1.25;
+    --drag-corner-radius: 6;
+    --drag-corner-radius-px: calc(
+        1px * var(--drag-corner-radius) * var(--drag-corner-mult)
+    );
+    --drag-corner-radius-hover-px: calc(
+        var(--drag-corner-radius-px) * var(--resize-mult-px)
+    );
+
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    .resizer {
+        position: absolute;
+        opacity: 0;
+        background-color: #00000055;
+        filter: invert(1);
+        transition: opacity 150ms ease, width 150ms ease, height 150ms ease;
+        pointer-events: all;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        &[data-direction='n'],
+        &[data-direction='s'] {
+            width: 100%;
+            height: var(--drag-handle-width-px);
+            cursor: n-resize;
+
+            &:hover {
+                height: var(--drag-handle-width-hover-px);
+            }
+        }
+
+        &[data-direction='e'],
+        &[data-direction='w'] {
+            height: 100%;
+            width: var(--drag-handle-width-px);
+            cursor: w-resize;
+            &:hover {
+                width: var(--drag-handle-width-hover-px);
+            }
+        }
+
+        &[data-direction='s'] {
+            bottom: 0;
+            cursor: s-resize;
+        }
+
+        &[data-direction='e'] {
+            right: 0;
+            cursor: e-resize;
+        }
+
+        &[data-direction='se'],
+        &[data-direction='ne'],
+        &[data-direction='nw'],
+        &[data-direction='sw'] {
+            cursor: nw-resize;
+            height: var(--drag-corner-radius-px);
+            width: var(--drag-corner-radius-px);
+
+            &:hover {
+                height: var(--drag-corner-radius-hover-px);
+                width: var(--drag-corner-radius-hover-px);
+            }
+        }
+
+        &[data-direction='nw'] {
+            border-bottom-right-radius: var(--drag-corner-radius-px);
+            &:hover {
+                border-bottom-right-radius: var(--drag-corner-radius-hover-px);
+            }
+        }
+
+        &[data-direction='ne'] {
+            right: 0;
+            cursor: ne-resize;
+            border-bottom-left-radius: var(--drag-corner-radius-px);
+            &:hover {
+                border-bottom-left-radius: var(--drag-corner-radius-hover-px);
+            }
+        }
+
+        &[data-direction='sw'] {
+            bottom: 0;
+            cursor: sw-resize;
+            border-top-right-radius: var(--drag-corner-radius-px);
+            &:hover {
+                border-top-right-radius: var(--drag-corner-radius-hover-px);
+            }
+        }
+
+        &[data-direction='se'] {
+            bottom: 0;
+            right: 0;
+            cursor: se-resize;
+            border-top-left-radius: var(--drag-corner-radius-px);
+            &:hover {
+                border-top-left-radius: var(--drag-corner-radius-hover-px);
+            }
+        }
+    }
+}
+
+.flash {
+    animation: flash 250ms ease-in-out;
+}
+
+@keyframes flash {
+    0% {
+        background-color: var(--autotoc-panel-bg);
+    }
+    50% {
+        background-color: var(--autotoc-flash-color);
+    }
+    100% {
+        background-color: var(--autotoc-panel-bg);
+    }
+}

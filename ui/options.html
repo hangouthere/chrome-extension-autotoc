@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AutoToC Options</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Gugi&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="options.css" />
+    </head>
+    <body>
+        <div id="autotoc-settings">
+            <h1 class="autotoc-title">AutoToC Settings</h1>
+
+            <div class="settings-container">
+                <fieldset>
+                    <legend>ToC Button</legend>
+
+                    <div class="setting">
+                        <label>
+                            Background Color
+                            <input type="color" id="autotoc-button-bg" />
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label>
+                            Hover Color
+                            <input type="color" id="autotoc-button-hover" />
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label>
+                            Text Color
+                            <input type="color" id="autotoc-button-text" />
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label>
+                            Outline Color
+                            <input type="color" id="autotoc-button-outline" />
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label>
+                            Outline Width (px)
+                            <input
+                                type="number"
+                                id="autotoc-button-outline-width"
+                                min="0"
+                            />
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label>
+                            Button Size
+                            <input
+                                type="number"
+                                id="autotoc-button-width"
+                                min="0"
+                            />
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>ToC Panel</legend>
+
+                    <div class="setting">
+                        <label>
+                            Background Color
+                            <input type="color" id="autotoc-panel-bg" />
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label>
+                            Text Color
+                            <input type="color" id="autotoc-panel-text" />
+                        </label>
+                    </div>
+
+                    <div class="setting"></div>
+
+                    <div class="setting">
+                        <label>
+                            Header Font
+                            <small>
+                                from
+                                <a
+                                    href="https://fonts.google.com/"
+                                    target="_blank"
+                                >
+                                    Google Fonts
+                                </a>
+                            </small>
+                            <input type="text" id="autotoc-panel-font-name" />
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Header Font Size
+                            <input type="number" id="autotoc-panel-font-size" />
+                        </label>
+                    </div>
+
+                    <div class="setting"></div>
+
+                    <div class="setting">
+                        <label>
+                            Header Color
+                            <input type="color" id="autotoc-panel-heading" />
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Header Hover Color
+                            <input
+                                type="color"
+                                id="autotoc-panel-heading-hover"
+                            />
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Search Highlight
+                            <input type="color" id="autotoc-panel-highlight" />
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Outline Color
+                            <input type="color" id="autotoc-panel-outline" />
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label>
+                            Outline Width (px)
+
+                            <input
+                                type="number"
+                                id="autotoc-panel-outline-width"
+                                min="0"
+                            />
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Border Radius (px)
+
+                            <input
+                                type="number"
+                                id="autotoc-panel-border-radius"
+                                min="0"
+                            />
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Toggle Nest Limit
+                            <input
+                                type="number"
+                                min="0"
+                                max="5"
+                                id="autotoc-panel-nest-limit"
+                            />
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Content Settings</legend>
+
+                    <div class="setting">
+                        <label>
+                            Attention Flash Color
+                            <input type="color" id="autotoc-flash-color" />
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Add Transparency
+                            <input
+                                type="checkbox"
+                                id="autotoc-add-transparency"
+                            />
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Main Container Selectors (comma, separated)
+                            <textarea
+                                type="text"
+                                id="autotoc-main-container-selectors"
+                            ></textarea>
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Secondary Container Selectors (comma, separated)<br />
+                            <small>Used if Main yields no results</small>
+                            <textarea
+                                type="text"
+                                id="autotoc-secondary-container-selectors"
+                            ></textarea>
+                        </label>
+                    </div>
+
+                    <div class="setting">
+                        <label>
+                            Heading Container Blacklist Selectors (comma,
+                            separated)
+                            <textarea
+                                type="text"
+                                id="autotoc-header-blacklist-selectors"
+                            ></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="settings-buttons">
+                <button type="button" id="autotoc-save">Save</button>
+                <button type="button" id="autotoc-reset">
+                    Reset to Defaults
+                </button>
+
+                <footer class="autotoc-footer">
+                    Built by CodexHere |&nbsp;
+                    <a
+                        href="https://github.com/hangouthere/chrome-extension-autotoc"
+                        target="_blank"
+                        >Github</a
+                    >
+                </footer>
+            </div>
+        </div>
+
+        <script src="../src/lib/settings.js"></script>
+        <script src="../src/options.js"></script>
+    </body>
+</html>

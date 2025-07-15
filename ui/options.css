@@ -1,0 +1,201 @@
+@import url(./styles.css);
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--autotoc-panel-bg);
+    color: var(--autotoc-panel-text);
+}
+
+#autotoc-settings {
+    .autotoc-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .settings-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    fieldset {
+        width: 100%;
+        max-width: 500px;
+        min-width: 400px;
+        padding: 10px;
+        border: 1px solid var(--autotoc-panel-outline);
+        border-radius: var(--autotoc-panel-border-radius);
+        background-color: color-mix(
+            in srgb,
+            var(--autotoc-panel-bg) 100%,
+            black 20%
+        );
+
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+
+        legend {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .setting {
+            display: inline-flex;
+            width: 30%;
+            box-sizing: border-box;
+            justify-content: center;
+
+            &:has(textarea) {
+                min-width: 100%;
+                margin-top: 15px;
+                margin-bottom: 15px;
+                min-height: 150px;
+
+                flex-basis: 100%;
+                max-width: 100%;
+
+                label {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            label {
+                display: inline-flex;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    }
+
+    input,
+    textarea {
+        margin-top: 10px;
+    }
+
+    input[type='text'] {
+        width: 100%;
+        padding: 0.4em;
+    }
+
+    input[type='checkbox'],
+    input[type='text'],
+    input[type='number'] {
+        box-sizing: border-box;
+        color: var(--autotoc-panel-text);
+        background: color-mix(in srgb, var(--autotoc-panel-bg) 100%, black 30%);
+        border-color: var(--autotoc-panel-outline);
+        border-radius: 0.5em;
+    }
+
+    input[type='number'] {
+        height: 3em;
+        width: 4.25em;
+        font-size: 1.25em;
+        text-align: center;
+    }
+
+    input[type='color'] {
+        width: 50px;
+        height: 50px;
+        box-sizing: border-box;
+    }
+
+    input[type='checkbox'] {
+        width: 30px;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        width: 90%;
+        height: 100%;
+        background: color-mix(in srgb, var(--autotoc-panel-bg) 100%, black 50%);
+        color: var(--autotoc-panel-text);
+        border-color: var(--autotoc-panel-outline);
+        border-radius: 0.5em;
+        padding: 10px;
+    }
+
+    .settings-buttons {
+        --offset: calc(50% - 49vw);
+        text-align: center;
+        position: sticky;
+        bottom: -1px;
+        background: var(--autotoc-panel-bg);
+        padding: 10px;
+        margin: 4em var(--offset) 1em var(--offset);
+
+        /* Gradient shadow */
+        &::before {
+            --size: 10px;
+            content: '';
+            position: absolute;
+            top: calc(-1 * var(--size));
+            left: 0;
+            right: 0;
+            height: var(--size);
+            background: linear-gradient(
+                to top,
+                rgba(0, 0, 0, 0.5),
+                transparent
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: var(--autotoc-button-bg);
+            color: var(--autotoc-button-text);
+            border: var(--autotoc-button-outline-width) solid
+                var(--autotoc-button-outline);
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 10px 0 0;
+
+            &:hover {
+                background-color: var(--autotoc-button-hover);
+            }
+        }
+    }
+
+    .autotoc-footer {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+
+        a:visited {
+            color: inherit;
+        }
+    }
+}
+
+#autotoc-notification {
+    display: inline-block;
+    position: fixed;
+    bottom: 125px;
+    color: white;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    &.success {
+        opacity: 1;
+        background-color: #28a745;
+    }
+
+    &.error {
+        background-color: #dc3545;
+    }
+}
