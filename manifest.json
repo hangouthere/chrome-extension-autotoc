@@ -18,6 +18,7 @@
                 "src/lib/Draggable.js",
                 "src/lib/ScrollTracker.js",
                 "src/lib/PanelTemplate.js",
+                "src/Utils.js",
                 "src/content.js"
             ],
             "css": ["ui/styles.css"]
