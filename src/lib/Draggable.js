@@ -17,7 +17,7 @@ class Draggable {
         return this.#element;
     }
 
-    constructor(element) {
+    connect(element) {
         const dragHandle = element.querySelector('.drag-handle') ?? element;
 
         this.#element = element;

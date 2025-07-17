@@ -13,10 +13,11 @@
         {
             "matches": ["<all_urls>"],
             "js": [
-                "src/lib/settings.js",
-                "src/lib/resizable.js",
-                "src/lib/draggable.js",
-                "src/lib/template_panel.js",
+                "src/lib/Settings.js",
+                "src/lib/Resizable.js",
+                "src/lib/Draggable.js",
+                "src/lib/ScrollTracker.js",
+                "src/lib/PanelTemplate.js",
                 "src/content.js"
             ],
             "css": ["ui/styles.css"]

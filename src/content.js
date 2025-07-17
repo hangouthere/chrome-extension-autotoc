@@ -4,7 +4,7 @@
  * GitHub: https://github.com/hangouthere/chrome-extension-autotoc
  */
 
-class AutoToCContent {
+class AutoToCExtension {
     /** @type {Draggable} */
     #btnDraggable = null;
     /** @type {Draggable} */
@@ -13,6 +13,8 @@ class AutoToCContent {
     #headingsList = null;
     /** @type {Settings} */
     #settings = null;
+    /** @type {ScrollTracker} */
+    #scrollTracker = null;
 
     #isVisible = false;
     #isDeleted = false;
@@ -21,8 +23,6 @@ class AutoToCContent {
     #numHeadings = 0;
     #isJumping = false;
     #headings = [];
-
-    #_onScrollWindow = null;
 
     constructor() {
         this.#init();
@@ -49,7 +49,7 @@ class AutoToCContent {
 
         await this.refreshTOC();
 
-        // this.#setupScrollTracking();
+        this.#reconnectScrollTracking();
     }
 
     #bindChromeMessages() {
@@ -100,7 +100,8 @@ class AutoToCContent {
 
         document.body.appendChild(button);
 
-        this.#btnDraggable = new AutoToC.Draggable(button);
+        this.#btnDraggable = new AutoToC.Draggable();
+        this.#btnDraggable.connect(button);
     }
 
     #injectFloatingPanel() {
@@ -109,14 +110,17 @@ class AutoToCContent {
         const panel = document.createElement('div');
         panel.id = 'autotoc-panel';
         panel.classList.add('hidden');
-        panel.innerHTML = AutoToC.TemplatePanelContents;
+        panel.innerHTML = TemplatePanelContents;
 
         this.#headingsList = panel.querySelector('.headings-list');
 
         document.body.appendChild(panel);
 
-        this.#panelDraggable = new AutoToC.Draggable(panel);
-        new AutoToC.Resizable(panel); //set and forget
+        this.#panelDraggable = new AutoToC.Draggable();
+        this.#panelDraggable.connect(panel);
+
+        const resizable = new AutoToC.Resizable();
+        resizable.connect(panel);
     }
 
     #bindUiEvents() {
@@ -178,7 +182,7 @@ class AutoToCContent {
             async e => {
                 e.stopPropagation();
                 await this.refreshTOC();
-                this.flashPanel();
+                this.#flashPanel();
             }
         );
 
@@ -239,7 +243,7 @@ class AutoToCContent {
         return containers;
     }
 
-    flashPanel() {
+    #flashPanel() {
         const flashDelay = 20;
         const headings = this.#headingsList.querySelectorAll(
             '.autotoc-heading-jumper'
@@ -607,7 +611,8 @@ class AutoToCContent {
                     );
 
                     await this.refreshTOC();
-                    this.flashPanel();
+                    this.#flashPanel();
+                    this.#reconnectScrollTracking();
                 }
             });
 
@@ -620,13 +625,13 @@ class AutoToCContent {
         }
     }
 
-    #setupScrollTracking = () => {
-        document.removeEventListener('scroll', this.#_onScrollWindow);
-
-        this.#_onScrollWindow = this.#onScrollWindow.bind(this, this.#headings);
-
-        document.addEventListener('scroll', this.#_onScrollWindow);
-    };
+    #reconnectScrollTracking() {
+        if (this.#scrollTracker) {
+            this.#scrollTracker.disconnect();
+        }
+        this.#scrollTracker = new AutoToC.ScrollTracker();
+        this.#scrollTracker.connect(this.#headings);
+    }
 
     #onScrollWindow(headings) {
         // TODO: Might toss this idea, it's a LOT of work
@@ -764,4 +769,4 @@ const findParentScroll = element => {
     return findParentScroll(element.parentElement);
 };
 
-const autoToCContent = new AutoToCContent();
+new AutoToCExtension();

@@ -27,7 +27,7 @@ class Resizable {
         return this.#element;
     }
 
-    constructor(element) {
+    connect(element) {
         this.#element = element;
 
         const resizerCtr = document.createElement('div');
@@ -191,5 +191,5 @@ class Resizable {
 }
 
 window.AutoToC = window.AutoToC ?? {};
-window.AutoToC.Resizable = Resizable;
 window.AutoToC.MARGIN_OFFSET = 40;
+window.AutoToC.Resizable = Resizable;
