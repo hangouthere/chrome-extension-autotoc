@@ -10,7 +10,7 @@ const MainContainerSelectors =
 const SecondaryContainerSelectors =
     'main, div.main, div.content, section.content, div.container';
 
-const HeaderBlacklistSelectors =
+const HeadingBlacklistSelectors =
     '.hidden, header, footer, aside, [role="navigation"]';
 
 const DefaultSettings = {
@@ -37,39 +37,30 @@ const DefaultSettings = {
     'autotoc-flash-color': '#f28c38',
     'autotoc-main-container-selectors': MainContainerSelectors,
     'autotoc-secondary-container-selectors': SecondaryContainerSelectors,
-    'autotoc-header-blacklist-selectors': HeaderBlacklistSelectors
+    'autotoc-heading-blacklist-selectors': HeadingBlacklistSelectors
 };
 
-class Settings {
-    map = {};
+class SettingsManager {
+    #map = {};
 
-    async init() {
-        const savedSettings = await chrome.storage.sync.get(
-            Object.keys(DefaultSettings)
-        );
-        this.map = Object.assign({}, DefaultSettings, savedSettings);
+    /** @type {HTMLElement} */
+    #eventBus;
+
+    get map() {
+        return this.#map;
     }
 
-    async updateStyles() {
-        await this.init();
+    constructor(eventBus) {
+        this.#eventBus = eventBus;
+    }
 
-        const settingsNames = Object.keys(this.map);
-
-        settingsNames.forEach(settingName => {
-            document.documentElement.style.setProperty(
-                `--${settingName}`,
-                this.map[settingName]
-            );
-        });
-
-        document.body.classList.toggle(
-            'autotoc-has-transparency',
-            this.map['autotoc-add-transparency']
-        );
+    async init() {
+        await this.#getSettings();
+        await this.updateStyles();
     }
 
     async saveSettings(newSettings) {
-        const finalSettings = Object.assign({}, this.map, newSettings);
+        const finalSettings = Object.assign({}, this.#map, newSettings);
         await chrome.storage.sync.set(finalSettings);
         return chrome.runtime.lastError ? chrome.runtime.lastError : true;
     }
@@ -78,7 +69,37 @@ class Settings {
         await chrome.storage.sync.clear();
         return chrome.runtime.lastError ? chrome.runtime.lastError : true;
     }
+
+    async updateStyles() {
+        await this.#getSettings();
+
+        const settingsNames = Object.keys(this.#map);
+
+        settingsNames.forEach(settingName => {
+            document.documentElement.style.setProperty(
+                `--${settingName}`,
+                this.#map[settingName]
+            );
+        });
+
+        document.body.classList.toggle(
+            'autotoc-has-transparency',
+            this.#map['autotoc-add-transparency']
+        );
+    }
+
+    async #getSettings() {
+        const savedSettings = await chrome.storage.sync.get(
+            Object.keys(DefaultSettings)
+        );
+
+        this.#map = Object.assign({}, DefaultSettings, savedSettings);
+
+        this.#eventBus.dispatchEvent(
+            new CustomEvent('settingsChanged', { detail: this.#map })
+        );
+    }
 }
 
 window.AutoToC = window.AutoToC ?? {};
-window.AutoToC.Settings = Settings;
+window.AutoToC.SettingsManager = SettingsManager;

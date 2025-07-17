@@ -13,11 +13,15 @@
         {
             "matches": ["<all_urls>"],
             "js": [
-                "src/lib/Settings.js",
                 "src/lib/Resizable.js",
                 "src/lib/Draggable.js",
                 "src/lib/ScrollTracker.js",
                 "src/lib/PanelTemplate.js",
+                "src/managers/MutationManager.js",
+                "src/managers/ScrollManager.js",
+                "src/managers/SettingsManager.js",
+                "src/managers/ToCManager.js",
+                "src/managers/UIManager.js",
                 "src/Utils.js",
                 "src/content.js"
             ],

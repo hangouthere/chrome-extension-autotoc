@@ -9,40 +9,43 @@ class Draggable {
     #element = null;
     #startDragPos = { x: 0, y: 0 };
 
-    #_dragStart = null;
-    #_dragMove = null;
-    #_dragEnd = null;
-
     get element() {
         return this.#element;
     }
 
-    connect(element) {
-        const dragHandle = element.querySelector('.drag-handle') ?? element;
-
+    constructor(element) {
         this.#element = element;
-        this.#_dragStart = this.#dragStart.bind(this, element);
-        dragHandle.addEventListener('mousedown', this.#_dragStart);
+        element.addEventListener('mousedown', this.#dragStart);
     }
 
-    #dragStart(element, e) {
+    destruct() {
+        this.#element.querySelector('.drag-handle') ?? element;
+        this.#element.removeEventListener('mousedown', this.#dragStart);
+        this.#dragEnd();
+    }
+
+    #dragStart = e => {
+        const dragHandle = e.target;
+
+        if (false === dragHandle.classList.contains('drag-handle')) {
+            return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
         this.hasMoved = false;
 
         this.#startDragPos = {
-            x: e.clientX - element.offsetLeft,
-            y: e.clientY - element.offsetTop
+            x: e.clientX - this.#element.offsetLeft,
+            y: e.clientY - this.#element.offsetTop
         };
 
-        this.#_dragMove = this.#dragMove.bind(this, element);
-        this.#_dragEnd = this.#dragEnd.bind(this, element);
-        document.addEventListener('mousemove', this.#_dragMove);
-        document.addEventListener('mouseup', this.#_dragEnd);
-    }
+        document.addEventListener('mousemove', this.#dragMove);
+        document.addEventListener('mouseup', this.#dragEnd);
+    };
 
-    #dragMove(element, e) {
+    #dragMove = e => {
         e.preventDefault();
         e.stopPropagation();
         this.hasMoved = true;
@@ -57,18 +60,20 @@ class Draggable {
         const vh = document.documentElement.clientHeight;
 
         // Clamp to viewport
-        newTop = Math.max(0, Math.min(newTop, vh - element.offsetHeight));
-        newLeft = Math.max(0, Math.min(newLeft, vw - element.offsetWidth));
+        newTop = Math.max(0, Math.min(newTop, vh - this.#element.offsetHeight));
+        newLeft = Math.max(
+            0,
+            Math.min(newLeft, vw - this.#element.offsetWidth)
+        );
 
-        element.style.top = `${newTop}px`;
-        element.style.left = `${newLeft}px`;
-    }
+        this.#element.style.top = `${newTop}px`;
+        this.#element.style.left = `${newLeft}px`;
+    };
 
-    #dragEnd() {
-        document.removeEventListener('mousemove', this.#_dragMove);
-        document.removeEventListener('mouseup', this.#_dragEnd);
-        this.#_dragMove = this.#_dragEnd = null;
-    }
+    #dragEnd = () => {
+        document.removeEventListener('mousemove', this.#dragMove);
+        document.removeEventListener('mouseup', this.#dragEnd);
+    };
 }
 
 window.AutoToC = window.AutoToC ?? {};

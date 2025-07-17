@@ -5,14 +5,17 @@
  */
 
 class AutoToCExtension {
-    /** @type {UIManager} */
+    /** @type {SettingsManager} */
+    #settings;
+    /** @type {MutationManager} */
+    #mutManager;
+    /** @type {UiManager} */
     #uiManager;
     /** @type {ToCManager} */
     #tocManager;
-    /** @type {Settings} */
-    #settings;
-    /** @type {ScrollTracker} */
-    #scrollTracker;
+    /** @type {ScrollManager} */
+    #scrollManager;
+
     /** @type {HTMLElement} */
     #eventBus;
     /** @type {boolean} */
@@ -23,29 +26,69 @@ class AutoToCExtension {
     }
 
     async #init() {
-        this.#eventBus = document.createElement('div'); // cheesy hack
-        this.#settings = new Settings();
-        await this.#settings.init();
+        this.#eventBus = document.createElement('div'); // cheesy hack, but isolated
 
-        this.#settings.updateStyles();
+        // this.#uiManager = new AutoToC.UiManager(this.#eventBus);
+        // this.#scrollManager = new AutoToC.ScrollManager(this.#eventBus);
 
-        this.#uiManager = new UIManager(this, this.#settings, this.#eventBus);
+        // this.#uiManager.init();
+        // this.#scrollManager.init();
 
-        this.#tocManager = new ToCManager(
-            this,
-            this.#settings,
-            this.#uiManager
-        );
+        this.#bindBusEvents();
         this.#bindChromeMessages();
-        this.#uiManager.injectUI();
-        await this.#tocManager.refreshTOC();
-        this.#reconnectScrollTracking();
+
+        this.#settings = new AutoToC.SettingsManager(this.#eventBus);
+        this.#settings.init();
     }
+
+    #bindBusEvents() {
+        this.#eventBus.addEventListener(
+            'settingsChanged',
+            this.#settingsChanged
+        );
+
+        this.#eventBus.addEventListener('uiReady', this.#uiReady);
+        this.#eventBus.addEventListener('tocRefreshed', this.#tocRefreshed);
+    }
+
+    #settingsChanged = ({ detail: settingsMap }) => {
+        if (this.#uiManager) {
+            return;
+        }
+
+        this.#uiManager = new AutoToC.UiManager(this.#eventBus, settingsMap);
+        this.#mutManager = new AutoToC.MutationManager(
+            this.#eventBus,
+            settingsMap
+        );
+
+        this.#uiManager.init();
+        this.#mutManager.init();
+    };
+
+    #uiReady = ({ detail: panelElement }) => {
+        this.#tocManager = new AutoToC.ToCManager(
+            this.#eventBus,
+            this.#settings.map,
+            panelElement
+        );
+        this.#scrollManager = new AutoToC.ScrollManager(this.#eventBus);
+
+        this.#tocManager.init();
+        this.#scrollManager.init();
+    };
+
+    #tocRefreshed = ({ detail: { numHeadings } }) => {
+        AutoToC.Utils.updateExtIcon(
+            numHeadings,
+            numHeadings > 0 ? '#ffffff' : '#ce1717'
+        );
+    };
 
     #bindChromeMessages() {
         chrome.runtime.onMessage.addListener(async message => {
             if (this.#isDeleted) return;
-            
+
             switch (message.action) {
                 case 'toggle-panel':
                     this.#uiManager.togglePanel();
@@ -66,17 +109,6 @@ class AutoToCExtension {
                     break;
             }
         });
-    }
-
-    #reconnectScrollTracking() {
-        if (this.#scrollTracker) {
-            this.#scrollTracker.disconnect();
-        }
-        this.#scrollTracker = new ScrollTracker(
-            this.#tocManager.getHeadings(),
-            this.#uiManager
-        );
-        this.#scrollTracker.connect();
     }
 }
 

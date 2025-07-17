@@ -16,31 +16,30 @@ const TemplateResizers = `
 `;
 
 class Resizable {
-    hasMoved = false;
     #element = null;
-
-    #_dragStart = null;
-    #_dragMove = null;
-    #_dragEnd = null;
+    #dir = null;
 
     get element() {
         return this.#element;
     }
 
-    connect(element) {
+    constructor(element) {
         this.#element = element;
 
         const resizerCtr = document.createElement('div');
         resizerCtr.classList.add('autotoc-resizer-container');
         resizerCtr.innerHTML = TemplateResizers;
 
-        this.#_dragStart = this.#dragStart.bind(this, element);
-
         element.appendChild(resizerCtr);
-        element.addEventListener('mousedown', this.#_dragStart);
+        element.addEventListener('mousedown', this.#dragStart);
     }
 
-    #dragStart(element, e) {
+    destruct() {
+        this.#element.removeEventListener('mousedown', this.#dragStart);
+        this.#dragEnd();
+    }
+
+    #dragStart = e => {
         const dragHandle = e.target;
 
         if (false === dragHandle.classList.contains('resizer')) {
@@ -50,24 +49,17 @@ class Resizable {
         e.preventDefault();
         e.stopPropagation();
 
-        this.hasMoved = false;
+        this.#dir = dragHandle.dataset.direction;
 
-        this.#_dragMove = this.#dragMove.bind(
-            this,
-            element,
-            dragHandle.dataset.direction
-        );
+        document.addEventListener('mousemove', this.#dragMove);
+        document.addEventListener('mouseup', this.#dragEnd);
+    };
 
-        this.#_dragEnd = this.#dragEnd.bind(this, element);
-        document.addEventListener('mousemove', this.#_dragMove);
-        document.addEventListener('mouseup', this.#_dragEnd);
-    }
-
-    #dragMove(element, direction, e) {
+    #dragMove = e => {
         e.preventDefault();
         e.stopPropagation();
-        this.hasMoved = true;
 
+        const element = this.#element;
         const styles = getComputedStyle(element);
         const minWidth = parseFloat(styles.minWidth) || 0;
         const minHeight = parseFloat(styles.minHeight) || 0;
@@ -86,7 +78,7 @@ class Resizable {
 
         const clampOpts = { rect, minWidth, minHeight };
 
-        switch (direction) {
+        switch (this.#dir) {
             case 'n':
                 // break early to avoid weird side-effects of other dimensions
                 if (0 > my || rect.h - my <= minHeight) {
@@ -153,7 +145,7 @@ class Resizable {
         element.style.top = `${rect.y}px`;
         element.style.width = `${rect.w}px`;
         element.style.height = `${rect.h}px`;
-    }
+    };
 
     clampWindowRect({ rect, minWidth, minHeight, dir }) {
         const vh = document.documentElement.clientHeight;
@@ -183,11 +175,10 @@ class Resizable {
         return rect;
     }
 
-    #dragEnd() {
-        document.removeEventListener('mousemove', this.#_dragMove);
-        document.removeEventListener('mouseup', this.#_dragEnd);
-        this.#_dragMove = this.#_dragEnd = null;
-    }
+    #dragEnd = () => {
+        document.removeEventListener('mousemove', this.#dragMove);
+        document.removeEventListener('mouseup', this.#dragEnd);
+    };
 }
 
 window.AutoToC = window.AutoToC ?? {};

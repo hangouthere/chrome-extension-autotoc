@@ -53,7 +53,16 @@ class Utils {
             return element;
         }
 
-        return Utilities.findParentScroll(element.parentElement);
+        return Utils.findParentScroll(element.parentElement);
+    }
+
+    static displayParentHeirarchy(li) {
+        const hasParent = li.parentElement.closest('li');
+
+        if (hasParent) {
+            hasParent.classList.toggle('visible', true);
+            displayParentHeirarchy(hasParent);
+        }
     }
 }
 

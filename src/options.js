@@ -5,7 +5,7 @@
  */
 
 class AutoToCOptions {
-    /** @type {Settings} */
+    /** @type {SettingsManager} */
     #settings = null;
     /** @type {HTMLDivElement} */
     #notification = null;
@@ -16,7 +16,9 @@ class AutoToCOptions {
     }
 
     async #initialize() {
-        this.#settings = new AutoToC.Settings();
+        this.#settings = new AutoToC.SettingsManager(
+            document.createElement('div')
+        );
 
         document.addEventListener('DOMContentLoaded', () => {
             this.#loadSettings();

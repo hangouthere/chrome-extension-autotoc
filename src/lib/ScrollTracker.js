@@ -5,9 +5,17 @@ class ScrollTracker {
     /**
      * @param {Array<Element>} elements
      */
-    connect(elements) {
+    constructor(elements) {
         this.#elements = elements;
+    }
 
+    destruct() {
+        this.#scrollAreas.forEach(scrollArea => {
+            scrollArea.removeEventListener('scroll', this.#handleScroll);
+        });
+    }
+
+    init() {
         let scrollAreas = [];
         this.#elements.forEach(element => {
             const parentScrolls = this.#findParentScrolls(element);
@@ -19,12 +27,6 @@ class ScrollTracker {
 
         this.#scrollAreas.forEach(scrollArea => {
             scrollArea.addEventListener('scroll', this.#handleScroll);
-        });
-    }
-
-    disconnect() {
-        this.#scrollAreas.forEach(scrollArea => {
-            scrollArea.removeEventListener('scroll', this.#handleScroll);
         });
     }
 
