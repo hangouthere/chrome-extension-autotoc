@@ -60,7 +60,9 @@ class SettingsManager {
         await this.updateStyles();
     }
 
-    destruct() {}
+    destruct() {
+        this.#map = null;
+    }
 
     async saveSettings(newSettings) {
         const finalSettings = Object.assign({}, this.#map, newSettings);

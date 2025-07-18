@@ -12,6 +12,11 @@ class ScrollManager {
 
     destruct() {
         this.#eventBus = null;
+
+        if (this.#scrollTracker) {
+            this.#scrollTracker.destruct();
+            this.#scrollTracker = null;
+        }
     }
 
     init() {

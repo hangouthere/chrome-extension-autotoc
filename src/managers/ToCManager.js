@@ -32,6 +32,7 @@ class ToCManager {
         this.#panel.removeEventListener('click', this.#onClickPanel);
 
         this.#eventBus = null;
+        this.#scanContainers = this.#panelListItems = null;
     }
 
     init() {
