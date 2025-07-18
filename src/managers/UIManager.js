@@ -1,3 +1,6 @@
+const TTY_TIMEOUT = 10000;
+const DESTROY_TIMEOUT = 30000;
+
 class UiManager {
     #settings;
     /** @type {Draggable} */
@@ -8,6 +11,8 @@ class UiManager {
     #eventBus;
     /** @type {boolean} */
     #isVisible = true; // hack for toggle state
+
+    #idleTimer;
 
     constructor(eventBus, settingsMap) {
         this.#eventBus = eventBus;
@@ -39,12 +44,19 @@ class UiManager {
     }
 
     #tocRefreshed = ({ detail: { numHeadings } }) => {
+        const headingsMissing = 0 >= numHeadings;
+
         const statsFound = this.#panelDraggable.element.querySelector(
             '.autotoc-stats--found'
         );
 
-        statsFound.textContent =
-            0 >= numHeadings ? 'No Headings Found' : `Found: ${numHeadings}`;
+        statsFound.textContent = headingsMissing
+            ? 'No Headings Found'
+            : `Found: ${numHeadings}`;
+
+        if (headingsMissing) {
+            this.#idleTimeout();
+        }
     };
 
     #buildUi = () => {
@@ -95,6 +107,7 @@ class UiManager {
         const btn = this.#btnDraggable.element;
         const pnl = this.#panelDraggable.element;
 
+        btn.addEventListener('mouseover', this.#onMouseToggleButton);
         btn.addEventListener('click', this.#onClickToggleButton);
 
         pnl.querySelector('.autotoc-options-cog')?.addEventListener(
@@ -127,6 +140,16 @@ class UiManager {
             this.#onSearch
         );
     }
+
+    #onMouseToggleButton = e => {
+        clearTimeout(this.#idleTimer);
+        this.#idleTimer = setTimeout(this.#idleTimeout, TTY_TIMEOUT);
+        this.#btnDraggable.element.classList.remove('inactive');
+    };
+
+    #idleTimeout = () => {
+        this.#btnDraggable.element.classList.add('inactive');
+    };
 
     #onClickToggleButton = e => {
         e.preventDefault();

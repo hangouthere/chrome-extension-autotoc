@@ -1,6 +1,6 @@
 Panel:
-* Scrolling page should indicate Heading Focus in Panel
 * Disable/disappear after inactivity or no headings found
+* Scrolling page should indicate Heading Focus in Panel
 * When NestLimit < 3?, indentations are broken
 
 Options:

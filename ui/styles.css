@@ -62,10 +62,14 @@ body.autotoc-has-transparency {
     align-items: center;
     user-select: none;
     transition: background-color 1s ease, border 1s ease, color 1s ease,
-        width 1s ease, height 1s ease;
+        width 1s ease, height 1s ease, opacity 500ms ease;
 
     &:hover {
         background-color: var(--autotoc-button-hover);
+    }
+
+    &.inactive {
+        opacity: 0.2;
     }
 }
 
