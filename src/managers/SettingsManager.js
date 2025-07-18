@@ -32,6 +32,7 @@ const DefaultSettings = {
     'autotoc-panel-nest-limit': 3,
     'autotoc-panel-font-name': 'Roboto',
     'autotoc-panel-font-size': 18,
+    'autotoc-panel-toggle': '#ffc35c',
 
     'autotoc-add-transparency': 1,
     'autotoc-flash-color': '#f28c38',

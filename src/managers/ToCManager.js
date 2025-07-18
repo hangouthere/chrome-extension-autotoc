@@ -146,14 +146,14 @@ class ToCManager {
                     ulStack.pop();
                 }
 
-                const listItemHeader = this.#buildToggleHeader({
+                const listItemHeading = this.#buildToggleHeading({
                     heading,
                     canToggle: canToggle()
                 });
 
                 listItem.dataset.autotocHeadingIdx =
                     heading.dataset.autotocHeadingIdx = idxCtr + idxHdr;
-                listItem.appendChild(listItemHeader);
+                listItem.appendChild(listItemHeading);
 
                 if (hasSubHeadings()) {
                     subUl = document.createElement('ul');
@@ -197,12 +197,12 @@ class ToCManager {
         );
     };
 
-    #buildToggleHeader({ heading, canToggle }) {
-        const listItemHeader = document.createElement('div');
+    #buildToggleHeading({ heading, canToggle }) {
+        const listItemHeading = document.createElement('div');
         if (canToggle) {
             const toggle = document.createElement('span');
             toggle.classList.add('autotoc-toggle');
-            listItemHeader.appendChild(toggle);
+            listItemHeading.appendChild(toggle);
         }
 
         const textContent = [...heading.childNodes]
@@ -216,9 +216,9 @@ class ToCManager {
         const anchor = document.createElement('a');
         anchor.classList.add('autotoc-heading-jumper');
         anchor.textContent = textContent || heading.firstChild.textContent;
-        listItemHeader.appendChild(anchor);
+        listItemHeading.appendChild(anchor);
 
-        return listItemHeader;
+        return listItemHeading;
     }
 
     #showNoToC(rootUl) {
