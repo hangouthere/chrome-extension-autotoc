@@ -2,7 +2,6 @@ class ToCManager {
     #eventBus;
     #settings;
 
-    // !! TODO: LOOK INTO moving into ScanManager?
     #panel;
     #scanContainers = [];
     #panelListItems = [];
@@ -309,7 +308,7 @@ class ToCManager {
         return count;
     }
 
-    #applyFilter(query) {
+    #applyFilter({ detail: query }) {
         query = query.toLowerCase().trim();
         const statsSearch = this.#panel.querySelector('.autotoc-stats--search');
 

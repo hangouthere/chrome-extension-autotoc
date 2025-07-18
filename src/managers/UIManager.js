@@ -31,7 +31,6 @@ class UiManager {
 
     init() {
         this.#bindBusEvents();
-
         this.#buildUi();
     }
 
@@ -44,11 +43,8 @@ class UiManager {
             '.autotoc-stats--found'
         );
 
-        if (0 >= numHeadings) {
-            statsFound.textContent = 'No Headings Found';
-        } else {
-            statsFound.textContent = `Found: ${numHeadings}`;
-        }
+        statsFound.textContent =
+            0 >= numHeadings ? 'No Headings Found' : `Found: ${numHeadings}`;
     };
 
     #buildUi = () => {
@@ -113,37 +109,22 @@ class UiManager {
 
         pnl.querySelector('.autotoc-refresh')?.addEventListener(
             'click',
-            async e => {
-                e.stopPropagation();
-                this.#eventBus.dispatchEvent(
-                    new CustomEvent('refreshTOC', { detail: true })
-                );
-            }
+            this.#onClickRefresh
         );
 
-        pnl.querySelector('.autotoc-collapse')?.addEventListener('click', e => {
-            e.stopPropagation();
-            this.#eventBus.dispatchEvent(
-                new CustomEvent('toggleAllSections', { detail: false })
-            );
-        });
+        pnl.querySelector('.autotoc-collapse')?.addEventListener(
+            'click',
+            this.#onClickCollapseAll
+        );
 
-        pnl.querySelector('.autotoc-expand')?.addEventListener('click', e => {
-            e.stopPropagation();
-            this.#eventBus.dispatchEvent(
-                new CustomEvent('toggleAllSections', { detail: true })
-            );
-        });
+        pnl.querySelector('.autotoc-expand')?.addEventListener(
+            'click',
+            this.#onClickExpandAll
+        );
 
         pnl.querySelector('.autotoc-search-input')?.addEventListener(
             'input',
-            e => {
-                this.#eventBus.dispatchEvent(
-                    new CustomEvent('applyFilter', {
-                        detail: e.target.value
-                    })
-                );
-            }
+            this.#onSearch
         );
     }
 
@@ -155,6 +136,27 @@ class UiManager {
         }
     };
 
+    #onClickCollapseAll = e => {
+        e.stopPropagation();
+        this.#eventBus.dispatchEvent(
+            new CustomEvent('toggleAllSections', { detail: false })
+        );
+    };
+
+    #onClickExpandAll = e => {
+        e.stopPropagation();
+        this.#eventBus.dispatchEvent(
+            new CustomEvent('toggleAllSections', { detail: true })
+        );
+    };
+
+    #onClickRefresh = async e => {
+        e.stopPropagation();
+        this.#eventBus.dispatchEvent(
+            new CustomEvent('refreshTOC', { detail: true })
+        );
+    };
+
     #onClickOptions = e => {
         e.stopPropagation();
         chrome.runtime.sendMessage({ action: 'open_options' });
@@ -163,6 +165,14 @@ class UiManager {
     #onClickClose = e => {
         e.stopPropagation();
         this.#togglePanel(false);
+    };
+
+    #onSearch = e => {
+        this.#eventBus.dispatchEvent(
+            new CustomEvent('applyFilter', {
+                detail: e.target.value
+            })
+        );
     };
 
     async #togglePanel(forceToggle = null) {

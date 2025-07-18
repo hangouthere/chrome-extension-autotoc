@@ -52,9 +52,10 @@ class AutoToCExtension {
     }
 
     #settingsChanged = ({ detail: settingsMap }) => {
-        if (this.#uiManager) {
-            return;
-        }
+        this.#eventBus.removeEventListener(
+            'settingsChanged',
+            this.#settingsChanged
+        );
 
         this.#uiManager = new AutoToC.UiManager(this.#eventBus, settingsMap);
         this.#mutManager = new AutoToC.MutationManager(
@@ -67,12 +68,12 @@ class AutoToCExtension {
     };
 
     #uiReady = ({ detail: panelElement }) => {
+        this.#scrollManager = new AutoToC.ScrollManager(this.#eventBus);
         this.#tocManager = new AutoToC.ToCManager(
             this.#eventBus,
             this.#settings.map,
             panelElement
         );
-        this.#scrollManager = new AutoToC.ScrollManager(this.#eventBus);
 
         this.#tocManager.init();
         this.#scrollManager.init();
@@ -94,7 +95,11 @@ class AutoToCExtension {
                     this.#uiManager.togglePanel();
                     break;
                 case 'refresh-panel':
-                    await this.#tocManager.refreshTOC();
+                    this.#eventBus.dispatchEvent(
+                        new CustomEvent('refreshTOC', {
+                            detail: true
+                        })
+                    );
                     break;
                 case 'delete-panel':
                     this.#uiManager.deletePanel();
@@ -105,7 +110,13 @@ class AutoToCExtension {
                         'AutoToC: Settings changed, updating styles...'
                     );
                     await this.#settings.updateStyles();
-                    await this.#tocManager.refreshTOC();
+
+                    this.#eventBus.dispatchEvent(
+                        new CustomEvent('refreshTOC', {
+                            detail: false
+                        })
+                    );
+
                     break;
             }
         });

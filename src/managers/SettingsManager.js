@@ -70,7 +70,7 @@ class SettingsManager {
         return chrome.runtime.lastError ? chrome.runtime.lastError : true;
     }
 
-    async updateStyles() {
+    async updateStyles(overrides = {}) {
         await this.#getSettings();
 
         const settingsNames = Object.keys(this.#map);
@@ -78,7 +78,7 @@ class SettingsManager {
         settingsNames.forEach(settingName => {
             document.documentElement.style.setProperty(
                 `--${settingName}`,
-                this.#map[settingName]
+                overrides[settingName] ?? this.#map[settingName]
             );
         });
 

@@ -96,7 +96,7 @@ class AutoToCOptions {
                 : inputElement.value;
 
         this.#inputs[inputElement.id] = value;
-        this.#settings.updateStyles();
+        this.#settings.updateStyles(this.#inputs);
     };
 
     async #saveSettings() {

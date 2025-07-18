@@ -61,7 +61,8 @@ body.autotoc-has-transparency {
     justify-content: center;
     align-items: center;
     user-select: none;
-    transition: background-color 250ms ease;
+    transition: background-color 1s ease, border 1s ease, color 1s ease,
+        width 1s ease, height 1s ease;
 
     &:hover {
         background-color: var(--autotoc-button-hover);
@@ -111,7 +112,6 @@ body.autotoc-has-transparency {
 
     header {
         font-size: 20px;
-        color: var(--autotoc-panel-text);
         user-select: none;
         flex-shrink: 0;
         line-height: 1.5;
@@ -263,6 +263,8 @@ body.autotoc-has-transparency {
         a.autotoc-heading-jumper {
             text-decoration: none;
             color: var(--autotoc-panel-heading);
+            transition: color 200ms ease;
+
             &:hover {
                 color: var(--autotoc-panel-heading-hover);
             }
@@ -307,6 +309,10 @@ body.autotoc-has-transparency {
             }
         }
     }
+
+    footer.autotoc-footer {
+        transition: color 1s ease;
+    }
 }
 
 /* reused in mulitple locations, don't encapsulate */
@@ -319,6 +325,7 @@ footer.autotoc-footer {
     color: var(--autotoc-panel-text);
     text-align: center;
     flex-shrink: 0;
+    transition: color 1s ease;
 
     a {
         color: var(--autotoc-panel-heading);

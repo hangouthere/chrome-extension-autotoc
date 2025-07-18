@@ -20,6 +20,7 @@ body {
         justify-content: center;
         max-width: 700px;
         margin: 0 auto;
+        padding: 0 30px;
     }
 
     fieldset {
@@ -27,8 +28,9 @@ body {
         max-width: 500px;
         min-width: 400px;
         padding: 10px;
-        border: 1px solid var(--autotoc-panel-outline);
-        border-radius: var(--autotoc-panel-border-radius);
+        border: var(--autotoc-panel-outline-width-px) solid
+            var(--autotoc-panel-outline);
+        border-radius: var(--autotoc-panel-border-radius-px);
         background-color: color-mix(
             in srgb,
             var(--autotoc-panel-bg) 100%,
@@ -153,7 +155,7 @@ body {
             padding: 10px 20px;
             background-color: var(--autotoc-button-bg);
             color: var(--autotoc-button-text);
-            border: var(--autotoc-button-outline-width) solid
+            border: var(--autotoc-button-outline-width-px) solid
                 var(--autotoc-button-outline);
             border-radius: 5px;
             cursor: pointer;

@@ -53,7 +53,7 @@ class ScrollManager {
             document.removeEventListener('scrollend', scrollEnded);
         };
 
-        foundHeading.style.scrollMarginTop = '5px';
+        foundHeading.style.scrollMarginTop = '10px';
         foundHeading.scrollIntoView({ behavior: 'smooth' });
         foundHeading.style.scrollMarginTop = oldMarginTop;
         document.addEventListener('scrollend', scrollEnded);
