@@ -3,6 +3,7 @@ Panel:
 * Scrolling page should indicate Heading Focus in Panel
 * When NestLimit < 3?, indentations are broken
 
+
 Options:
 * Add Github Workflow publishing:
   * https://jam.dev/blog/automating-chrome-extension-publishing/

@@ -30,6 +30,10 @@ class UiManager {
             this.#btnDraggable.destruct();
         }
 
+        this.#eventBus.removeEventListener('tocRefreshed', this.#tocRefreshed);
+        this.#eventBus.removeEventListener('togglePanel', this.#togglePanelMsg);
+        this.#unbindUiEvents();
+
         this.#btnDraggable = this.#panelDraggable = null;
         this.#eventBus = null;
     }
@@ -41,6 +45,7 @@ class UiManager {
 
     #bindBusEvents() {
         this.#eventBus.addEventListener('tocRefreshed', this.#tocRefreshed);
+        this.#eventBus.addEventListener('togglePanel', this.#togglePanelMsg);
     }
 
     #tocRefreshed = ({ detail: { numHeadings } }) => {
@@ -141,6 +146,44 @@ class UiManager {
         );
     }
 
+    #unbindUiEvents() {
+        const btn = this.#btnDraggable.element;
+        const pnl = this.#panelDraggable.element;
+
+        btn.removeEventListener('mouseover', this.#onMouseToggleButton);
+        btn.removeEventListener('click', this.#onClickToggleButton);
+
+        pnl.querySelector('.autotoc-options-cog')?.removeEventListener(
+            'click',
+            this.#onClickOptions
+        );
+
+        pnl.querySelector('.autotoc-close')?.removeEventListener(
+            'click',
+            this.#onClickClose
+        );
+
+        pnl.querySelector('.autotoc-refresh')?.removeEventListener(
+            'click',
+            this.#onClickRefresh
+        );
+
+        pnl.querySelector('.autotoc-collapse')?.removeEventListener(
+            'click',
+            this.#onClickCollapseAll
+        );
+
+        pnl.querySelector('.autotoc-expand')?.removeEventListener(
+            'click',
+            this.#onClickExpandAll
+        );
+
+        pnl.querySelector('.autotoc-search-input')?.removeEventListener(
+            'input',
+            this.#onSearch
+        );
+    }
+
     #onMouseToggleButton = e => {
         clearTimeout(this.#idleTimer);
         this.#idleTimer = setTimeout(this.#idleTimeout, TTY_TIMEOUT);
@@ -198,7 +241,12 @@ class UiManager {
         );
     };
 
-    async #togglePanel(forceToggle = null) {
+    // This one handles events
+    #togglePanelMsg = async ({ detail: forceToggle }) => {
+        return this.#togglePanel(forceToggle);
+    };
+
+    #togglePanel = async (forceToggle = null) => {
         if (!this.#panelDraggable) return;
 
         const panel = this.#panelDraggable.element;
@@ -215,7 +263,7 @@ class UiManager {
                 new CustomEvent('refreshTOC', { detail: false })
             );
         }
-    }
+    };
 }
 
 window.AutoToC = window.AutoToC ?? {};

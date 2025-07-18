@@ -35,7 +35,10 @@
     "action": {
         "default_popup": "ui/options.html",
         "default_icon": {
-            "32": "images/icon32.png"
+            "16": "images/icon32.png",
+            "32": "images/icon32.png",
+            "48": "images/icon32.png",
+            "128": "images/icon32.png"
         }
     },
     "content_security_policy": {

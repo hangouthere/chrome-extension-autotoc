@@ -60,6 +60,8 @@ class SettingsManager {
         await this.updateStyles();
     }
 
+    destruct() {}
+
     async saveSettings(newSettings) {
         const finalSettings = Object.assign({}, this.#map, newSettings);
         await chrome.storage.sync.set(finalSettings);

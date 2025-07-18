@@ -41,7 +41,16 @@ class AutoToCBackground {
         return Promise.all(tabs.map(sendMessage));
     }
 
-    async #onMessage(message) {
+    #onCommand = command => {
+        // proxy command to the current window
+        chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+            if (tabs[0]) {
+                chrome.tabs.sendMessage(tabs[0].id, { action: command });
+            }
+        });
+    };
+
+    #onMessage = async message => {
         if (message.action === 'update_badge') {
             await this.#updateBadge(message);
         } else if (message.action === 'open_options') {
@@ -49,10 +58,12 @@ class AutoToCBackground {
         } else if (message.action === 'update-styles-all-tabs') {
             await this.#updateStylesAllTabs();
         }
-    }
+    };
 
     #bindChromeEvents() {
-        chrome.runtime.onMessage.addListener(this.#onMessage.bind(this));
+        chrome.commands.onCommand.addListener(this.#onCommand);
+
+        chrome.runtime.onMessage.addListener(this.#onMessage);
     }
 }
 

@@ -19,7 +19,6 @@ class Draggable {
     }
 
     destruct() {
-        this.#element.querySelector('.drag-handle') ?? element;
         this.#element.removeEventListener('mousedown', this.#dragStart);
         this.#dragEnd();
     }

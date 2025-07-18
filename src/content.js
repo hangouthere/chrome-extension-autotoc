@@ -28,12 +28,6 @@ class AutoToCExtension {
     async #init() {
         this.#eventBus = document.createElement('div'); // cheesy hack, but isolated
 
-        // this.#uiManager = new AutoToC.UiManager(this.#eventBus);
-        // this.#scrollManager = new AutoToC.ScrollManager(this.#eventBus);
-
-        // this.#uiManager.init();
-        // this.#scrollManager.init();
-
         this.#bindBusEvents();
         this.#bindChromeMessages();
 
@@ -92,7 +86,9 @@ class AutoToCExtension {
 
             switch (message.action) {
                 case 'toggle-panel':
-                    this.#uiManager.togglePanel();
+                    this.#eventBus.dispatchEvent(
+                        new CustomEvent('togglePanel', { detail: null })
+                    );
                     break;
                 case 'refresh-panel':
                     this.#eventBus.dispatchEvent(
@@ -102,13 +98,13 @@ class AutoToCExtension {
                     );
                     break;
                 case 'delete-panel':
-                    this.#uiManager.deletePanel();
-                    this.#isDeleted = true;
+                    this.#destruct();
                     break;
                 case 'update-styles':
                     console.log(
                         'AutoToC: Settings changed, updating styles...'
                     );
+
                     await this.#settings.updateStyles();
 
                     this.#eventBus.dispatchEvent(
@@ -120,6 +116,16 @@ class AutoToCExtension {
                     break;
             }
         });
+    }
+
+    #destruct() {
+        this.#settings.destruct();
+        this.#mutManager.destruct();
+        this.#uiManager.destruct();
+        this.#tocManager.destruct();
+        this.#scrollManager.destruct();
+
+        this.#isDeleted = true;
     }
 }
 

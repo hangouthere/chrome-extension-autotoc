@@ -21,9 +21,15 @@ class ToCManager {
             this.#toggleAllSections
         );
         this.#eventBus.removeEventListener(
+            'mutationObserved',
+            this.#mutationObserved
+        );
+        this.#eventBus.removeEventListener(
             'settingsChanged',
             this.#settingsChanged
         );
+
+        this.#panel.removeEventListener('click', this.#onClickPanel);
 
         this.#eventBus = null;
     }
@@ -55,34 +61,36 @@ class ToCManager {
     }
 
     #bindUiEvents() {
-        this.#panel.addEventListener('click', e => {
-            const elem = e.target;
-            const classes = elem.classList;
-            const isToggle = classes.contains('autotoc-toggle');
-            const isHdrJump = classes.contains('autotoc-heading-jumper');
-
-            if (!(isToggle || isHdrJump)) return;
-
-            e.preventDefault();
-
-            const listItem = elem.closest('li.heading-list-item');
-
-            if (isToggle) {
-                this.#toggleSection(listItem);
-            }
-
-            if (isHdrJump) {
-                this.#eventBus.dispatchEvent(
-                    new CustomEvent('scrollTo', { detail: listItem })
-                );
-            }
-        });
+        this.#panel.addEventListener('click', this.#onClickPanel);
     }
 
     #settingsChanged = ({ detail: settingsMap }) => {
         this.#settings = settingsMap;
 
         this.#refreshTOC({ detail: false });
+    };
+
+    #onClickPanel = e => {
+        const elem = e.target;
+        const classes = elem.classList;
+        const isToggle = classes.contains('autotoc-toggle');
+        const isHdrJump = classes.contains('autotoc-heading-jumper');
+
+        if (!(isToggle || isHdrJump)) return;
+
+        e.preventDefault();
+
+        const listItem = elem.closest('li.heading-list-item');
+
+        if (isToggle) {
+            this.#toggleSection(listItem);
+        }
+
+        if (isHdrJump) {
+            this.#eventBus.dispatchEvent(
+                new CustomEvent('scrollTo', { detail: listItem })
+            );
+        }
     };
 
     #refreshTOC = async ({ detail: flashPanel }) => {
