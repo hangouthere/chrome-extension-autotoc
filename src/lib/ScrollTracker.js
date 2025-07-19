@@ -30,6 +30,18 @@ class ScrollTracker {
         });
     }
 
+<<<<<<< Updated upstream
+=======
+    disconnect() {
+        this.#scrollAreas.forEach(scrollArea => {
+            scrollArea.removeEventListener('scroll', this.#handleScroll);
+        });
+    }
+
+    /**
+     * @returns {Array<Element>}
+     */
+>>>>>>> Stashed changes
     #findParentScrolls(element) {
         const scrollAreas = [];
         let currentElement = element;
@@ -71,6 +83,9 @@ class ScrollTracker {
         );
     }
 
+    /**
+     * @returns {Array<Element>}
+     */
     #scanScrollAreas() {
         return this.#elements.reduce((acc, element) => {
             const scrollAreas = this.#findParentScrolls(element);
@@ -107,7 +122,6 @@ class ScrollTracker {
             return item;
         }, null);
 
-        // console.log(inViewItems);
         console.log(topItem);
     };
 }
