@@ -36,7 +36,7 @@ class MutationManager {
         );
 
         if (shouldRefresh) {
-            console.log(
+            AutoToC.Log(
                 'AutoToC: DOM Mutation detected, refreshing headings...'
             );
 

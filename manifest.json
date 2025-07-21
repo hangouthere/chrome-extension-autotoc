@@ -15,7 +15,7 @@
             "js": [
                 "src/lib/Resizable.js",
                 "src/lib/Draggable.js",
-                "src/lib/ScrollTracker.js",
+                "src/lib/ScrollObserver.js",
                 "src/lib/PanelTemplate.js",
                 "src/managers/MutationManager.js",
                 "src/managers/ScrollManager.js",

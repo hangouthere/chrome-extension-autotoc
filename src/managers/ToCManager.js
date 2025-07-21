@@ -116,7 +116,7 @@ class ToCManager {
                 this.#settings['autotoc-heading-blacklist-selectors']
             );
 
-            console.log(
+            AutoToC.Log(
                 'AutoToC: Headings found in Container:',
                 headings.length,
                 { container, headings }
@@ -208,6 +208,8 @@ class ToCManager {
 
     #buildToggleHeading({ heading, canToggle }) {
         const listItemHeading = document.createElement('div');
+        listItemHeading.classList.add('heading-line');
+
         if (canToggle) {
             const toggle = document.createElement('span');
             toggle.classList.add('autotoc-toggle');
@@ -236,7 +238,7 @@ class ToCManager {
         listItem.classList.add('expanded', 'no-toc');
         rootUl.innerHTML = '';
         rootUl.appendChild(listItem);
-        console.log('AutoToC: No Headings detected in any Container');
+        AutoToC.Log('AutoToC: No Headings detected in any Container');
     }
 
     async #setupScanContainers() {
@@ -249,19 +251,19 @@ class ToCManager {
         let containers = Array.from(document.querySelectorAll(selectors));
 
         if (!containers.length) {
-            console.log('AutoToC: No Primary Containers found...');
+            AutoToC.Log('AutoToC: No Primary Containers found...');
             selectors = selectorsSec;
             containers = Array.from(document.querySelectorAll(selectors));
 
             if (!containers.length) {
-                console.log(
+                AutoToC.Log(
                     'AutoToC: No Secondary Containers found, defaulting to <body>'
                 );
                 containers = [document.body];
             }
         }
 
-        console.log('AutoToC: Main Containers found:', containers.length, {
+        AutoToC.Log('AutoToC: Main Containers found:', containers.length, {
             selectors,
             containers
         });

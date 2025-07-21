@@ -33,7 +33,7 @@ class AutoToCBackground {
                     action: 'update-styles'
                 });
             } catch (error) {
-                console.log('AutoToC: Error sending message -', error.message);
+                AutoToC.Log('AutoToC: Error sending message -', error.message);
             }
         };
 

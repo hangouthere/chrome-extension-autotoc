@@ -1,21 +1,28 @@
 class ScrollManager {
     /** @type {HTMLElement} */
     #eventBus;
-    /** @type {ScrollTracker} */
-    #scrollTracker;
+    /** @type {HTMLElement} */
+    #panel;
+    /** @type {ScrollObserver} */
+    #scrollObserver;
+    // !!FIXME: This needs to be finished out...
     /** @type {boolean} */
     #isJumping;
 
-    constructor(eventBus) {
+    constructor(eventBus, panel) {
         this.#eventBus = eventBus;
+        this.#panel = panel;
     }
 
     destruct() {
+        this.#eventBus.removeEventListener('tocRefreshed', this.#tocRefreshed);
+        this.#eventBus.removeEventListener('scrollTo', this.#scrollTo);
+
         this.#eventBus = null;
 
-        if (this.#scrollTracker) {
-            this.#scrollTracker.destruct();
-            this.#scrollTracker = null;
+        if (this.#scrollObserver) {
+            this.#scrollObserver.destruct();
+            this.#scrollObserver = null;
         }
     }
 
@@ -29,12 +36,12 @@ class ScrollManager {
     }
 
     #scrollTo = ({ detail: listItem }) => {
-        const listIdx = listItem.dataset.autotocHeadingIdx;
-        const foundHeading = document.querySelector(
-            `[data-autotoc-heading-idx="${listIdx}"]`
+        const headingIdx = listItem.dataset.autotocHeadingIdx;
+        const headingJumper = this.#panel.querySelector(
+            `[data-autotoc-heading-idx="${headingIdx}"]`
         );
 
-        if (!foundHeading) {
+        if (!headingJumper) {
             console.log(
                 'AutoToC: Unable to find paired Heading for ',
                 listItem.textContent
@@ -43,89 +50,68 @@ class ScrollManager {
         }
 
         this.#isJumping = true;
-        const oldMarginTop = foundHeading.style.scrollMarginTop;
+        const oldMarginTop = headingJumper.style.scrollMarginTop;
 
         const scrollEnded = () => {
-            foundHeading.classList.add('flash');
+            headingJumper.classList.add('flash');
             setTimeout(() => {
                 this.#isJumping = false;
-                foundHeading.classList.remove('flash');
+                headingJumper.classList.remove('flash');
                 // !! FIXME: This needs to select the focused item?
                 // I'm thinking this should actually work itself out with the tracking
                 // system i partially built out... need to finish that, then re-eval this.
-                // this.#uiManager.#onScrollWindow([foundHeading]);
+                // this.#uiManager.#onScrollWindow([headingJumper]);
             }, 300);
             document.removeEventListener('scrollend', scrollEnded);
         };
 
-        foundHeading.style.scrollMarginTop = '10px';
-        foundHeading.scrollIntoView({ behavior: 'smooth' });
-        foundHeading.style.scrollMarginTop = oldMarginTop;
+        headingJumper.style.scrollMarginTop = '10px';
+        headingJumper.scrollIntoView({ behavior: 'smooth' });
+        headingJumper.style.scrollMarginTop = oldMarginTop;
         document.addEventListener('scrollend', scrollEnded);
     };
 
     #tocRefreshed = ({ detail: { headings } }) => {
-        if (this.#scrollTracker) {
-            this.#scrollTracker.destruct();
+        if (this.#scrollObserver) {
+            this.#scrollObserver.destruct();
         }
 
-        this.#scrollTracker = new AutoToC.ScrollTracker(headings);
-        this.#scrollTracker.init();
+        this.#scrollObserver = new AutoToC.ScrollObserver(
+            headings,
+            this.#onHeadingFocused
+        );
+        this.#scrollObserver.init();
+    };
+
+    #onHeadingFocused = heading => {
+        const headingIdx = heading.dataset.autotocHeadingIdx;
+
+        // Clear focused item(s)
+        this.#panel
+            .querySelectorAll(`li.heading-list-item.focused`)
+            .forEach(e => e.classList.remove('focused'));
+
+        const headingJumper = this.#panel.querySelector(
+            `[data-autotoc-heading-idx="${headingIdx}"]`
+        );
+
+        if (!headingJumper) {
+            AutoToC.Log(
+                `AutoToC: Unable to find paired Heading for (${headingIdx}) ${listItem.textContent}`
+            );
+
+            return;
+        }
+
+        headingJumper.classList.add('focused');
+
+        const { isInView } = AutoToC.Utils.getElementViewStats(headingJumper);
+
+        if (false === isInView) {
+            headingJumper.scrollIntoView({ smooth: true });
+        }
     };
 }
 
 window.AutoToC = window.AutoToC ?? {};
 window.AutoToC.ScrollManager = ScrollManager;
-
-// #onScrollWindow(headings) {
-// !! FIXME -- This needs some attention!!
-// this.#headingsList
-//     .querySelectorAll('[data-autotoc-heading-idx] .focused')
-//     .forEach(el => el.classList.remove('focused'));
-// if (this.#extension.#tocManager.#isJumping) {
-//     return;
-// }
-// const topHeading = Utils.getTopHeading(headings);
-// if (!topHeading) {
-//     console.log('AutoToC WARNING: NO HEADING FOUND TO SCROLL TO!');
-//     return;
-// }
-// const parentScrollTopHeading = Utils.findParentScroll(topHeading);
-// const topHeadingRect = topHeading.getBoundingClientRect();
-// const parentScrollTopHeadingRect =
-//     parentScrollTopHeading.getBoundingClientRect();
-// const topHeadingHeight = topHeadingRect.top + topHeadingRect.height;
-// const parentScrollHeight =
-//     parentScrollTopHeadingRect.top + parentScrollTopHeadingRect.height;
-// const isOnScreen = topHeadingHeight < parentScrollHeight;
-// console.log(
-//     'parentScrollTopHeadingRect.top',
-//     parentScrollTopHeadingRect.top,
-//     'parentScrollTopHeadingRect.height',
-//     parentScrollTopHeadingRect.height,
-//     'topHeadingRect.top',
-//     topHeadingRect.top,
-//     'topHeadingRect.height',
-//     topHeadingRect.height
-// );
-// if (!isOnScreen) {
-//     return;
-// }
-// console.log('on screen!');
-// const idx = topHeading.dataset.autotocHeadingIdx;
-// const foundHeadingJumper = this.#headingsList.querySelector(
-//     `[data-autotoc-heading-idx="${idx}"]`
-// );
-// const parentScrollJumper =
-//     Utils.findParentScroll(foundHeadingJumper);
-// const rect = foundHeadingJumper.getBoundingClientRect();
-// if (parentScrollJumper) {
-//     const oldMarginTop = foundHeadingJumper.style.scrollMarginTop;
-//     foundHeadingJumper.style.scrollMarginTop = '5px';
-//     foundHeadingJumper.scrollIntoView({ behavior: 'smooth' });
-//     foundHeadingJumper.style.scrollMarginTop = oldMarginTop;
-// }
-// foundHeadingJumper
-//     .querySelector('.autotoc-heading-jumper')
-//     .classList.add('focused');
-// }

@@ -22,7 +22,15 @@ class AutoToCExtension {
     #isDeleted;
 
     constructor() {
+        this.#enableDebug();
         this.#init();
+    }
+
+    #enableDebug() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('debug')) {
+            window.DEBUG = 'autotoc';
+        }
     }
 
     async #init() {
@@ -62,7 +70,7 @@ class AutoToCExtension {
     };
 
     #uiReady = ({ detail: panelElement }) => {
-        this.#scrollManager = new AutoToC.ScrollManager(this.#eventBus);
+        this.#scrollManager = new AutoToC.ScrollManager(this.#eventBus, panelElement);
         this.#tocManager = new AutoToC.ToCManager(
             this.#eventBus,
             this.#settings.map,
@@ -101,7 +109,7 @@ class AutoToCExtension {
                     this.#destruct();
                     break;
                 case 'update-styles':
-                    console.log(
+                    AutoToC.Log(
                         'AutoToC: Settings changed, updating styles...'
                     );
 

@@ -176,13 +176,23 @@ body.autotoc-has-transparency {
             margin: 0;
         }
 
-        li {
+        li.heading-list-item {
             display: none;
 
             margin: 5px 0;
+            scroll-margin: 5px;
 
             &.visible {
                 display: list-item;
+            }
+
+            &.focused {
+                border-left: 1px solid var(--autotoc-panel-outline);
+                transform: translateX(-1px);
+
+                & > .heading-line {
+                    font-weight: bold;
+                }
             }
 
             &:not(.expanded) {
@@ -271,10 +281,6 @@ body.autotoc-has-transparency {
 
             &:hover {
                 color: var(--autotoc-panel-heading-hover);
-            }
-
-            &.focused {
-                font-weight: bold;
             }
         }
 
