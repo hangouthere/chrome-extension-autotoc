@@ -196,6 +196,13 @@ class ToCManager {
             this.#flashPanel();
         }
 
+        this.#applyFilter({
+            detail: {
+                query: this.#panel.querySelector('.autotoc-search-input').value,
+                isForced: true
+            }
+        });
+
         this.#eventBus.dispatchEvent(
             new CustomEvent('tocRefreshed', {
                 detail: {
@@ -293,7 +300,7 @@ class ToCManager {
         this.#refreshTOC(event);
     };
 
-    #traverseListItems(ul, count) {
+    #traverseListItems(ul, count, query) {
         ul.querySelectorAll(':scope > li').forEach(listItem => {
             const link = listItem.querySelector('a.autotoc-heading-jumper');
             const childUl = listItem.querySelector(':scope > ul');
@@ -310,33 +317,38 @@ class ToCManager {
                     regex,
                     '<span class="highlight">$1</span>'
                 );
-                numFound++;
+                count++;
             }
 
-            if (childUl) count += this.#traverseListItems(childUl, count);
+            if (childUl) {
+                count = this.#traverseListItems(childUl, count, query);
+            }
         });
 
         return count;
     }
 
-    #applyFilter({ detail: query }) {
+    #applyFilter = ({ detail: { query, isForced } }) => {
         query = query.toLowerCase().trim();
         const statsSearch = this.#panel.querySelector('.autotoc-stats--search');
 
         if (!query) {
             statsSearch.style.display = 'none';
-            return this.refreshTOC();
+            return false === isForced
+                ? this.#refreshTOC({ detail: false })
+                : null;
         }
 
         const rootUl = this.#panel.querySelector('ul.rootUl');
+        const count = this.#traverseListItems(rootUl, 0, query);
+
         rootUl
             .querySelectorAll('li.visible')
             .forEach(AutoToC.Utils.displayParentHeirarchy);
 
-        const count = this.#traverseListItems(rootUl, 0);
         statsSearch.textContent = count > 0 ? `Filtered: ${count}` : '';
         statsSearch.style.display = count > 0 ? 'block' : 'none';
-    }
+    };
 
     #flashPanel = () => {
         const flashDelay = 20;

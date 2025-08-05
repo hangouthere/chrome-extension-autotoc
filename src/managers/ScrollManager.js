@@ -7,6 +7,8 @@ class ScrollManager {
     #scrollObserver;
     /** @type {boolean} */
     #isJumping;
+    /** @type {Function} */
+    #scrollEnded_handler;
 
     constructor(eventBus, panel) {
         this.#eventBus = eventBus;
@@ -39,9 +41,11 @@ class ScrollManager {
         const headingJumper = this.#panel.querySelector(
             `[data-autotoc-heading-idx="${headingIdx}"]`
         );
-        const headingTarget = document.body.querySelector(
-            `[data-autotoc-heading-idx="${headingIdx}"]`
-        );
+        const headingTarget = AutoToC.Utils.filterBlacklists([
+            ...document.body.querySelectorAll(
+                `[data-autotoc-heading-idx="${headingIdx}"]`
+            )
+        ])?.[0];
 
         if (!headingJumper || !headingTarget) {
             console.log(
@@ -54,21 +58,42 @@ class ScrollManager {
         this.#isJumping = true;
         const oldMarginTop = headingTarget.style.scrollMarginTop;
 
-        const scrollEnded = () => {
-            headingTarget.classList.add('flash');
-            setTimeout(() => {
-                this.#isJumping = false;
-                headingTarget.classList.remove('flash');
-                this.#onHeadingFocused(headingJumper);
-            }, 300);
-            document.removeEventListener('scrollend', scrollEnded);
-        };
+        const { isInView } = AutoToC.Utils.getElementViewStats(headingTarget);
+
+        this.#scrollEnded_handler = this.#scrollEnded.bind(
+            this,
+            headingJumper,
+            headingTarget
+        );
+
+        if (true === isInView) {
+            this.#scrollEnded_handler();
+            this.#onHeadingFocused(headingJumper);
+            return;
+        }
 
         headingTarget.style.scrollMarginTop = '10px';
         headingTarget.scrollIntoView({ behavior: 'smooth' });
         headingTarget.style.scrollMarginTop = oldMarginTop;
-        document.addEventListener('scrollend', scrollEnded);
+
+        document.addEventListener('scrollend', this.#scrollEnded_handler);
     };
+
+    #scrollEnded(headingJumper, headingTarget) {
+        document
+            .querySelectorAll('[data-autotoc-heading-idx].flash')
+            .forEach(e => e.classList.remove('flash'));
+
+        headingTarget.classList.add('flash');
+
+        setTimeout(() => {
+            this.#isJumping = false;
+            headingTarget.classList.remove('flash');
+            this.#onHeadingFocused(headingJumper);
+        }, 300);
+
+        document.removeEventListener('scrollend', this.#scrollEnded_handler);
+    }
 
     #tocRefreshed = ({ detail: { headings } }) => {
         if (this.#scrollObserver) {
@@ -77,7 +102,8 @@ class ScrollManager {
 
         this.#scrollObserver = new AutoToC.ScrollObserver(
             headings,
-            this.#onHeadingFocused
+            this.#onHeadingFocused,
+            50
         );
         this.#scrollObserver.init();
     };
@@ -98,6 +124,16 @@ class ScrollManager {
             `[data-autotoc-heading-idx="${headingIdx}"]`
         );
 
+        const focusParentHeirarchy = li => {
+            const hasParent = li.parentElement.closest('li');
+
+            if (!hasParent) {
+                return li.classList.toggle('focused', true);
+            }
+
+            focusParentHeirarchy(hasParent);
+        };
+
         if (!headingJumper) {
             AutoToC.Log(
                 `AutoToC: Unable to find paired Heading for (${headingIdx}) ${listItem.textContent}`
@@ -107,6 +143,7 @@ class ScrollManager {
         }
 
         headingJumper.classList.add('focused');
+        focusParentHeirarchy(headingJumper);
 
         const { isInView } = AutoToC.Utils.getElementViewStats(headingJumper);
 

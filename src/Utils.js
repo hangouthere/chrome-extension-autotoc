@@ -13,7 +13,10 @@ class Utils {
         });
     }
 
-    static filterBlacklists(headings, blacklistSelectors = '') {
+    static filterBlacklists(
+        headings,
+        blacklistSelectors = '.bogus-selector-for-sanity'
+    ) {
         return headings.filter(heading => {
             const style = getComputedStyle(heading);
             return (
@@ -25,14 +28,19 @@ class Utils {
         });
     }
 
-    static displayParentHeirarchy(li) {
+    static displayParentHeirarchy = li => {
         const hasParent = li.parentElement.closest('li');
 
         if (hasParent) {
             hasParent.classList.toggle('visible', true);
-            displayParentHeirarchy(hasParent);
+
+            if (hasParent.classList.contains('can-toggle')) {
+                hasParent.classList.toggle('expanded', true);
+            }
+
+            this.displayParentHeirarchy(hasParent);
         }
-    }
+    };
 
     /**
      * @returns {Array<Element>}

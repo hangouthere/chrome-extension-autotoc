@@ -236,7 +236,10 @@ class UiManager {
     #onSearch = e => {
         this.#eventBus.dispatchEvent(
             new CustomEvent('applyFilter', {
-                detail: e.target.value
+                detail: {
+                    query: e.target.value,
+                    isForced: false
+                }
             })
         );
     };
