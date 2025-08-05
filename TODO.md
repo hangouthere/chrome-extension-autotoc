@@ -1,5 +1,5 @@
 Panel:
-* Clicking on panel jumpers seems broken, need to blacklist fitler
+* Search be borked
 * Disable/disappear after inactivity or no headings found
 * Scrolling page should indicate Heading Focus in Panel
 * When NestLimit < 3?, indentations are broken

@@ -13,7 +13,7 @@ class Utils {
         });
     }
 
-    static filterBlacklists(headings, blacklistSelectors) {
+    static filterBlacklists(headings, blacklistSelectors = '') {
         return headings.filter(heading => {
             const style = getComputedStyle(heading);
             return (

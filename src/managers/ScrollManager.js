@@ -5,7 +5,6 @@ class ScrollManager {
     #panel;
     /** @type {ScrollObserver} */
     #scrollObserver;
-    // !!FIXME: This needs to be finished out...
     /** @type {boolean} */
     #isJumping;
 
@@ -40,8 +39,11 @@ class ScrollManager {
         const headingJumper = this.#panel.querySelector(
             `[data-autotoc-heading-idx="${headingIdx}"]`
         );
+        const headingTarget = document.body.querySelector(
+            `[data-autotoc-heading-idx="${headingIdx}"]`
+        );
 
-        if (!headingJumper) {
+        if (!headingJumper || !headingTarget) {
             console.log(
                 'AutoToC: Unable to find paired Heading for ',
                 listItem.textContent
@@ -50,24 +52,21 @@ class ScrollManager {
         }
 
         this.#isJumping = true;
-        const oldMarginTop = headingJumper.style.scrollMarginTop;
+        const oldMarginTop = headingTarget.style.scrollMarginTop;
 
         const scrollEnded = () => {
-            headingJumper.classList.add('flash');
+            headingTarget.classList.add('flash');
             setTimeout(() => {
                 this.#isJumping = false;
-                headingJumper.classList.remove('flash');
-                // !! FIXME: This needs to select the focused item?
-                // I'm thinking this should actually work itself out with the tracking
-                // system i partially built out... need to finish that, then re-eval this.
-                // this.#uiManager.#onScrollWindow([headingJumper]);
+                headingTarget.classList.remove('flash');
+                this.#onHeadingFocused(headingJumper);
             }, 300);
             document.removeEventListener('scrollend', scrollEnded);
         };
 
-        headingJumper.style.scrollMarginTop = '10px';
-        headingJumper.scrollIntoView({ behavior: 'smooth' });
-        headingJumper.style.scrollMarginTop = oldMarginTop;
+        headingTarget.style.scrollMarginTop = '10px';
+        headingTarget.scrollIntoView({ behavior: 'smooth' });
+        headingTarget.style.scrollMarginTop = oldMarginTop;
         document.addEventListener('scrollend', scrollEnded);
     };
 
@@ -84,6 +83,10 @@ class ScrollManager {
     };
 
     #onHeadingFocused = heading => {
+        if (true === this.#isJumping) {
+            return;
+        }
+
         const headingIdx = heading.dataset.autotocHeadingIdx;
 
         // Clear focused item(s)
@@ -108,7 +111,7 @@ class ScrollManager {
         const { isInView } = AutoToC.Utils.getElementViewStats(headingJumper);
 
         if (false === isInView) {
-            headingJumper.scrollIntoView({ smooth: true });
+            headingJumper.scrollIntoView({ behavior: 'smooth' });
         }
     };
 }

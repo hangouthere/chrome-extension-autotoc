@@ -70,7 +70,10 @@ class AutoToCExtension {
     };
 
     #uiReady = ({ detail: panelElement }) => {
-        this.#scrollManager = new AutoToC.ScrollManager(this.#eventBus, panelElement);
+        this.#scrollManager = new AutoToC.ScrollManager(
+            this.#eventBus,
+            panelElement
+        );
         this.#tocManager = new AutoToC.ToCManager(
             this.#eventBus,
             this.#settings.map,
