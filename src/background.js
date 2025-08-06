@@ -33,7 +33,10 @@ class AutoToCBackground {
                     action: 'update-styles'
                 });
             } catch (error) {
-                AutoToC.Log('AutoToC: Error sending message -', error.message);
+                console.log(
+                    `AutoToC: Error sending message to ${tab.title} -`,
+                    error.message
+                );
             }
         };
 
@@ -61,9 +64,9 @@ class AutoToCBackground {
     };
 
     #bindChromeEvents() {
-        chrome.commands.onCommand.addListener(this.#onCommand);
-
         chrome.runtime.onMessage.addListener(this.#onMessage);
+        // Commands are Chrome Keybind executions
+        chrome.commands.onCommand.addListener(this.#onCommand);
     }
 }
 
