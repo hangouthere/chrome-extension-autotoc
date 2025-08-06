@@ -1,0 +1,61 @@
+{
+    "manifest_version": 3,
+    "name": "AutoToC",
+    "version": "1.0",
+    "description": "Scans page headings in main content and provides a draggable round button to show a navigable hierarchy panel. Built by CodexHere (https://github.com/hangouthere/chrome-extension-autotoc).",
+    "author": "CodexHere",
+    "permissions": ["activeTab", "scripting", "commands", "storage", "tabs"],
+
+    "background": {
+        "service_worker": "src/background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": [
+                "src/lib/Resizable.js",
+                "src/lib/Draggable.js",
+                "src/lib/ScrollObserver.js",
+                "src/lib/PanelTemplate.js",
+                "src/managers/MutationManager.js",
+                "src/managers/ScrollManager.js",
+                "src/managers/SettingsManager.js",
+                "src/managers/ToCManager.js",
+                "src/managers/UIManager.js",
+                "src/Utils.js",
+                "src/content.js"
+            ],
+            "css": ["ui/styles.css"]
+        }
+    ],
+    "options_ui": {
+        "page": "ui/options.html",
+        "open_in_tab": true
+    },
+    "action": {
+        "default_popup": "ui/options.html",
+        "default_icon": {
+            "16": "images/icon32.png",
+            "32": "images/icon32.png",
+            "48": "images/icon32.png",
+            "128": "images/icon32.png"
+        }
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "commands": {
+        "toggle-panel": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+E"
+            },
+            "description": "Toggle the AutoToC panel"
+        },
+        "refresh-panel": {
+            "description": "Refresh the AutoToC panel"
+        },
+        "delete-panel": {
+            "description": "Delete the AutoToC panel and button"
+        }
+    }
+}
